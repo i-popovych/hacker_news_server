@@ -4,7 +4,6 @@ import allowCrossDomain from "./settings/allowCrossDomain.js";
 import authRouter from "./Auth/AuthRouter.js";
 import profileRouter from "./Profile/ProfileRouter.js"
 import config from "config";
-import newsRouter from "./News/NewsRouter.js"
 
 const PORT = config.get('PORT');
 const DB_URL = 'mongodb://127.0.0.1/hacker_news'
@@ -12,7 +11,6 @@ const app = express();
 
 app.use(allowCrossDomain);
 app.use(express.json());
-app.use('/api', newsRouter);
 app.use('/api', authRouter);
 app.use('/api', profileRouter);
 

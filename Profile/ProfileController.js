@@ -1,18 +1,16 @@
 import Person from "../authModel/Person.js";
-import NewsService from "../News/NewsService.js";
-import News from "../News/News.js";
 
 class ProfileController {
     async addNews(req, res) {
         try {
+            const userId = req.user._id;
             const {newsId} = req.body;
-            const user = await Person.findOne({_id: req.user._id});
-            let isAlreadyHave = user.savedNews.toString().split(',').includes(newsId);
-            if(isAlreadyHave) return res.status(400).json({message: 'the news has already added'})
-            const news = await NewsService.getOne(newsId);
-            await user.savedNews.push(news);
+            const user = await Person.findOne({_id: userId});
+            let isHave = user.savedNewsIds.toString().split(',').includes(newsId);
+            if (isHave) return res.status(400).json({message: 'the news has already added'})
+            user.savedNewsIds.push(newsId);
             await user.save();
-            return res.status(200).json({news})
+            return res.status(200).json({newsId})
         } catch (e) {
             return res.status(400).json(e.message);
         }
@@ -22,13 +20,8 @@ class ProfileController {
         try {
             const userId = req.user._id;
             const user = await Person.findOne({_id: userId});
-            const wtf = user.savedNews.toString().split(',');
-            let result = [];
-            for (let i of wtf) {
-                let temp = await NewsService.getOne(i);
-                result.push(temp)
-            }
-            return res.status(200).json(result)
+            const newsList = user.savedNewsIds.toString().split(',');
+            return res.status(200).json({newsList})
         } catch (e) {
             return res.status(400).json(e.message);
         }
@@ -38,10 +31,9 @@ class ProfileController {
         try {
             const {newsId} = req.query;
             const user = await Person.findOne({_id: req.user._id});
-            let isAlreadyHave = user.savedNews.toString().split(',').includes(newsId);
-            if(!isAlreadyHave) return res.status(400).json({message: 'cannot found news'})
-            await Person.findOneAndUpdate({_id: req.user._id}, {$pull: {savedNews: newsId}});
-            await user.save();
+            let isHave = user.savedNewsIds.toString().split(',').includes(newsId);
+            if (!isHave) return res.status(400).json({message: 'cannot found news'})
+            const newUser = await Person.updateOne({_id: req.user._id}, {$pull: {savedNewsIds: newsId}} )
             return res.status(200).json({message: 'all ok'})
         } catch (e) {
             return res.status(400).json(e.message);
