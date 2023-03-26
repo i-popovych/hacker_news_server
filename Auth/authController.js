@@ -8,9 +8,8 @@ class authController {
         try {
             const {username, password} = req.body;
             const candidate = await Person.findOne({username});
-            if (candidate) {
-                return res.status(400).json("The user with the same name already was registr")
-            }
+            if (candidate) return res.status(400).json("The user with the same name already was registr")
+            if (!username && !password) return res(400).json({message: 'login and password are empty strings'})
             const hashPass = bcrypt.hashSync(password, 7);
             const user = new Person({username, password: hashPass})
             await user.save();
