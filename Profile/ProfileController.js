@@ -33,7 +33,7 @@ class ProfileController {
             const user = await Person.findOne({_id: req.user._id});
             let isHave = user.savedNewsIds.toString().split(',').includes(newsId);
             if (!isHave) return res.status(404).json({message: 'no news found'})
-            // const newUser = await Person.updateOne({_id: req.user._id}, {$pull: {savedNewsIds: newsId}} )
+            await Person.updateOne({_id: req.user._id}, {$pull: {savedNewsIds: newsId}} )
             return res.status(204).json({message: 'the news has been successfully deleted'})
         } catch (e) {
             return res.status(400).json(e.message);
