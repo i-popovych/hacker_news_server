@@ -7,12 +7,12 @@ class ProfileController {
             const {newsId} = req.body;
             const user = await Person.findOne({_id: userId});
             let isHave = user.savedNewsIds.toString().split(',').includes(newsId);
-            if (isHave) return res.status(400).json({message: 'the news has already added'})
+            if (isHave) return res.status(409).json({message: 'the news has already added'})
             user.savedNewsIds.push(newsId);
             await user.save();
-            return res.status(200).json({newsId})
+            return res.status(201).json({newsId})
         } catch (e) {
-            return res.status(400).json(e.message);
+            return res.status(400).json({message: e.message});
         }
     }
 
@@ -32,9 +32,9 @@ class ProfileController {
             const {newsId} = req.query;
             const user = await Person.findOne({_id: req.user._id});
             let isHave = user.savedNewsIds.toString().split(',').includes(newsId);
-            if (!isHave) return res.status(400).json({message: 'cannot found news'})
-            const newUser = await Person.updateOne({_id: req.user._id}, {$pull: {savedNewsIds: newsId}} )
-            return res.status(200).json({message: 'all ok'})
+            if (!isHave) return res.status(404).json({message: 'no news found'})
+            // const newUser = await Person.updateOne({_id: req.user._id}, {$pull: {savedNewsIds: newsId}} )
+            return res.status(204).json({message: 'the news has been successfully deleted'})
         } catch (e) {
             return res.status(400).json(e.message);
         }
